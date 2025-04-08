@@ -2,18 +2,13 @@ package strt.array;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Random;
 import java.util.Set;
 
-import util.utils;
-
-public class Array {
+public class Hash {
 
     // 1.两数之和
     public int[] twoSum(int[] nums, int target) {
@@ -30,9 +25,7 @@ public class Array {
     // 两种方法：set去重，判断前后来去重
     public List<List<Integer>> threeSum(int[] nums) {
         Arrays.sort(nums);
-
-        // List<List<Integer>> results = new ArrayList<>();
-        Set<List<Integer>> set = new HashSet<>();
+        Set<List<Integer>> set = new HashSet<>();   // 两个List，只要内容相同，hashCode就相同
         for(int i = 0; i <= nums.length - 3; i++) {
             if(i >= 1 && nums[i] == nums[i - 1]) continue;  // 去重
             int left = i + 1, right = nums.length - 1;
@@ -43,10 +36,6 @@ public class Array {
                 } else if(sum > -nums[i]) {
                     right--;
                 } else {
-                    // results.add(Arrays.asList(i, left, right));
-                    // while(left < right && nums[left] == nums[left + 1]) left++;
-                    // while(left < right && nums[right] == nums[right - 1]) right--;
-                    // right--;
                     set.add(Arrays.asList(nums[i], nums[left], nums[right]));
                     left++;
                     right--;
@@ -61,29 +50,47 @@ public class Array {
     }
 
     // 49.字母异位词分组
+    // Map的键不能为int[]（因为数组的hashCode没有重写，只受内存位置影响），因此如果想用统计str内字母个数的方法，需要转为String
     public List<List<String>> groupAnagrams(String[] strs) {
-        return null;
+        Map<String, List<String>> map = new HashMap<>();
+        for(String str : strs) {
+            char[] c = str.toCharArray();
+            Arrays.sort(c);
+            List<String> list = map.getOrDefault(new String(c), new ArrayList<>());
+            list.add(str);
+            map.put(str, list);
+        }
+        return new ArrayList<List<String>>(map.values());
     }
-    
 
-
-
-
-
-
-
-
-
-    
+    // 128.最长连续序列
+    // 先用set去重，然后遍历set
+    // 为什么是O(n)，因为!set.contains(i - 1)去重，使得如果不是序列第一个元素，就continue
+    public int longestConsecutive(int[] nums) {
+        int maxCount = 0;
+        Set<Integer> set = new HashSet<>();
+        for(int i : nums) set.add(i);
+        for(int i : set) {
+            if(!set.contains(i - 1)) {
+                int count = 1, cur = i + 1;
+                while(set.contains(cur)) {
+                    count++;
+                    cur++;
+                }
+                maxCount = Math.max(maxCount, count);
+            }
+        }
+        return maxCount;
+    }
 
 
 
     public void run() {
-        
+        groupAnagrams(new String[]{"eat","tea","tan","ate","nat","bat"});
     }
     
     public static void main(String[] args) {
-        new Array().run();
+        new Hash().run();
     }
 
 
