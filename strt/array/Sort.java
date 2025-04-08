@@ -1,5 +1,6 @@
 package strt.array;
 
+import java.util.PriorityQueue;
 import java.util.Random;
 
 import util.utils;
@@ -158,8 +159,47 @@ public class Sort {
     // 从低位开始，逐位排序
 
 
-    // 排序链表
+    // 148.排序链表
     
+
+
+    // 215.数组中的第K个最大元素
+    public int findKthLargest(int[] nums, int k) {
+        // 方法1：快排
+        // partialQuickSort(nums, 0, nums.length - 1, k);
+        // return nums[k - 1];     // 注意其实是数组中的第k - 1个数，快排过程也要注意
+
+        // 方法2：堆
+        // 大顶堆也可以，全放进去之后poll出k-1个，剩下的堆顶就是第k大的了
+        PriorityQueue<Integer> pq = new PriorityQueue<>();  // 默认是小顶堆
+        for(int i : nums) {
+            pq.offer(i);
+            if(pq.size() > k) pq.poll();
+        }
+        return pq.peek();
+    }
+    void partialQuickSort(int[] nums, int start, int end, int k) {
+        if(start >= end) return;
+        int pivot = ascendPartition(nums, start, end);
+        if(pivot == k - 1) return;
+        else if(pivot < k - 1) partialQuickSort(nums, pivot + 1, end, k);
+        else partialQuickSort(nums, start, pivot - 1, k);
+    }
+    public int ascendPartition(int[] nums, int start, int end) {
+        if(start >= end) return start;
+        int pivotValue = nums[start];
+        int left = start + 1, right = end;
+        while(left <= right) {
+            while(left <= right && nums[left] > pivotValue) left++;
+            while(left <= right && nums[right] < pivotValue) right--;
+            if(left > right) break;
+            utils.swap(nums, left, right);
+            left++;
+            right--;
+        }
+        utils.swap(nums, start, right);
+        return right;
+    }
 
     public void run() {
         Random random = new Random();
